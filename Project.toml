@@ -1,0 +1,9 @@
+name = "RemoteLogging"
+uuid = "d1df70f7-2a97-4daf-85e9-cedaa6d2fe1b"
+authors = ["Rhahi <git@rhahi.com>"]
+version = "0.1.0"
+
+[deps]
+Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+LoggingExtras = "e6f89c97-d47a-5376-807f-9c37f3926c36"
+Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
