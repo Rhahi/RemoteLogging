@@ -3,12 +3,12 @@ module RemoteLogging
 using Sockets
 using Logging
 
-include("spacelib_loglevels.jl")
 include("commons.jl")
+include("spacelib_loglevels.jl")
 include("server.jl")
 
 # RemoteLogging
-export setup_host, setup_logger
+export host_tcp, setup_tcp_logger
 
 # SpaceLib log levels
 export @log_timer, @log_traceloop, @log_trace, @log_exit, @log_entry, @log_dev, @log_guidance
