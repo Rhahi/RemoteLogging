@@ -1,21 +1,9 @@
-# Debug (-1000)
-const LogGraphic   = ExtraLogLevel(-900, "Graphic")
-const LogTimer     = ExtraLogLevel(-800, "Timer")
-const LogTraceLoop = ExtraLogLevel(-700, "TraceLoop")
-const LogTrace     = ExtraLogLevel(-600, "Trace")
-const LogExit      = ExtraLogLevel(-400, "Exit ")
-const LogEntry     = ExtraLogLevel(-300, "Entry")
-const LogGuidance  = ExtraLogLevel(-200, "Guidance")
-const LogDev       = ExtraLogLevel(-100, "🐞 Develop")
-# Info (0)
-const LogStatus    = ExtraLogLevel( 100, "Status")
-const LogModule    = ExtraLogLevel( 300, "🟦 Module")
-const LogSystem    = ExtraLogLevel( 400, "🟪 System")
-const LogOk        = ExtraLogLevel( 600, "🟩   OK  ")
-const LogMark      = ExtraLogLevel( 800, "🟧  Mark ")
-# Warn (1000)
-const LogAttention = ExtraLogLevel(1500, "🟨  OBS! ")
-# Error (2000)
+module NativeLogLevels
+
+using RemoteLogging
+
+export @log_timer, @log_traceloop, @log_trace, @log_exit, @log_entry, @log_dev, @log_guidance
+export @log_status, @log_module, @log_system, @log_ok, @log_mark, @log_attention, @asyncx
 
 """debug information about drawing"""
 macro log_graphic(exs...)   return restore_callsite_source_position!(esc(:($Base.@logmsg LogGraphic $(exs...))), __source__,) end
@@ -58,3 +46,5 @@ macro log_mark(exs...)      return restore_callsite_source_position!(esc(:($Base
 
 """alert user for immediate action"""
 macro log_attention(exs...) return restore_callsite_source_position!(esc(:($Base.@logmsg LogAttention $(exs...))), __source__,) end
+
+end
