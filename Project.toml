@@ -1,7 +1,7 @@
 name = "RemoteLogging"
 uuid = "d1df70f7-2a97-4daf-85e9-cedaa6d2fe1b"
 authors = ["Rhahi <git@rhahi.com>"]
-version = "0.1.0"
+version = "1.0.0"
 
 [deps]
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
