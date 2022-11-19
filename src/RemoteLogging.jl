@@ -17,7 +17,6 @@ include("loglevels.jl")
 include("loglevels_printer.jl")
 include("loglevels_terminal.jl")
 include("remotelogger.jl")
-include("remoteprogress.jl")
 include("setup_host.jl")
 include("setup_client.jl")
 

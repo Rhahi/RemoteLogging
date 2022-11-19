@@ -1,4 +1,6 @@
-struct LogMessage
+abstract type Message end
+
+struct LogMessage <: Message
     level::Int32
     message::String
     logmodule::Module
@@ -7,6 +9,13 @@ struct LogMessage
     file::String
     line::Int32
 end
+
+struct ProgressMessage <: Message
+    id::UUID
+    name::String
+    progress::Float32
+end
+
 
 function package_logdata(_module, file, line, level, message, exs...)
     @nospecialize
@@ -56,3 +65,12 @@ function send_logdata(data)
     nothing
 end
 send_logdata(loggingchan, data) = put!(loggingchan, data); nothing
+
+function start_progress()
+end
+
+function update_progress()
+end
+
+function end_progress()
+end
