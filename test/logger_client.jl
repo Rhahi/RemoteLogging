@@ -5,15 +5,15 @@ logging, progress = activate()
 @remotelog 1000 "hello"
 
 id = progress_init("Test")
-sleep(1)
+sleep(0.5)
 progress_update(id, 0.5)
-sleep(1)
+sleep(0.5)
 progress_update(id, 0.9, "Test name")
-sleep(1)
+sleep(0.5)
 progress_end(id, name="ending")
 id2 = progress_init("Test2")
 progress_update(id2, 0.9)
-sleep(1)
+sleep(0.5)
 progress_update(id2, 1.1)
 
 @log_attention "test"

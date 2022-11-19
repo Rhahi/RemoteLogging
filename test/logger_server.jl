@@ -1,3 +1,3 @@
 using RemoteLogging
 
-active = activate_terminal()
+ref = activate_terminal()
