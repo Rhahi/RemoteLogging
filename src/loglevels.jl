@@ -74,3 +74,11 @@ function restore_callsite_source_position!(expr, src)
     expr.args[1].args[2] = src
     return expr
 end
+
+function show_colors()
+    for i in 0:255
+        num = rpad(string(i), 3)
+        printstyled("test[$num] ", bold=true, color=i)
+        printstyled("test[$num] ", bold=false, color=i)
+    end
+end
