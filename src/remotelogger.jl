@@ -35,15 +35,18 @@ function package_logdata(_module, file, line, level, message, exs...)
     return LogMessage(level, message, _module, _group, _id, file, line)
 end
 
+"""generic remote logging macro"""
 macro remotelog(level, exs...)
     data = package_logdata((@_sourceinfo)..., level, exs...)
     :(send_logdata($data))
 end
 
+"""get log obejct instead of sending them immdiately"""
 macro logdata(level, exs...)
     package_logdata((@_sourceinfo)..., level, exs...)
 end
 
+"""send log data remotely"""
 function send_logdata(data)
     global loggingchan
     if !@isdefined loggingchan
