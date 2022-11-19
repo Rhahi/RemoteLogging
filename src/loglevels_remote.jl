@@ -1,3 +1,18 @@
+module Terminal
+
+using RemoteLogging
+using RemoteLogging: restore_callsite_source_position!
+using Sockets
+
+function activate(host=IPv4(0), base_port=50021)
+    logger = RemoteLogging.begin_logger(host, base_port)
+    progress = RemoteLogging.begin_progress(host, base_port+1)
+    return logger, progress
+end
+
+export activate, @remotelog
+export @log_timer, @log_traceloop, @log_trace, @log_exit, @log_entry, @log_dev, @log_guidance
+export @log_status, @log_module, @log_system, @log_ok, @log_mark, @log_attention, @asyncx
 
 """debug information about drawing"""
 macro log_graphic(exs...)   return restore_callsite_source_position!(esc(:(@remotelog $(LogGraphic.level) $(exs...))), __source__,) end
@@ -40,3 +55,5 @@ macro log_mark(exs...)      return restore_callsite_source_position!(esc(:(@remo
 
 """alert user for immediate action"""
 macro log_attention(exs...) return restore_callsite_source_position!(esc(:(@remotelog $(LogAttention.level) $(exs...))), __source__,) end
+
+end

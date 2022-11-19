@@ -1,7 +1,15 @@
-module NativeLogLevels
+module Printer
 
 using RemoteLogging
+using RemoteLogging: restore_callsite_source_position!
+using Sockets
 
+function activate(logger, level; host=IPv4(0), base_port=50010)
+    printer = RemoteLogging.begin_printer(logger; host=host, port=base_port, min_level=level)
+    return printer
+end
+
+export activate
 export @log_timer, @log_traceloop, @log_trace, @log_exit, @log_entry, @log_dev, @log_guidance
 export @log_status, @log_module, @log_system, @log_ok, @log_mark, @log_attention, @asyncx
 
