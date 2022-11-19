@@ -6,12 +6,12 @@ function begin_logger(host=IPv4(0), port=50021)
 end
 
 function begin_progress(host=IPv4(0), port=50022)
-    global progresschan = Channel{ProgressMessage}(50)
+    global progresschan = Channel{Progress}(50)
     conn = setup_data(progresschan, host, port)
     return conn
 end
 
-function setup_data(chan::Channel{T}, host=IPv4(0), port=50020) where T <: Union{ProgressMessage, LogMessage}
+function setup_data(chan::Channel{T}, host=IPv4(0), port=50020) where T <: Union{Progress, LogMessage}
     conn = connect(host, port)
     @async begin
         try
