@@ -7,6 +7,7 @@ using LoggingExtras
 using Serialization
 using TerminalLoggers
 using ProgressLogging
+using ProgressLogging: Progress
 import Logging: LogLevel, handle_message
 import TerminalLoggers: default_logcolor
 import Base: show, isless, convert
@@ -14,17 +15,17 @@ import Base.CoreLogging: default_group_code, log_record_id, @_sourceinfo
 
 
 include("loglevels.jl")
-include("loglevels_printer.jl")
-include("loglevels_terminal.jl")
 include("remotelogger.jl")
 include("setup_host.jl")
 include("setup_client.jl")
+include("loglevels_printer.jl")
+include("loglevels_terminal.jl")
 
 
 # RemoteLogging
-export Terminal, Printer, LogMessage, ProgressMessage
-export host_printer, host_data, host_logger, host_progress, host_dev
-export begin_logging_sink, begin_progress_sink
+export Terminal, Printer, LogMessage
+export activate_printer, activate_terminal, clear_progress
+export progress_init, progress_update, progress_end
 
 # remote log macros
 export @remotelog, @logdata
@@ -32,6 +33,5 @@ export @remotelog, @logdata
 # SpaceLib log levels
 export LogTimer, LogTraceLoop, LogTrace, LogExit, LogEntry, LogGuidance, LogDev
 export LogStatus, LogModule, LogSystem, LogOk, LogMark, LogAttention
-export @dev_json
 
 end # module RemoteLogging
