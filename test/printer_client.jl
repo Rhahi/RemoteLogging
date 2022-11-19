@@ -1,6 +1,5 @@
-using RemoteLogging
-using RemoteLogging.NativeLogLevels
+using RemoteLogging.Printer
 
-client = begin_printer()
+client = activate()
 
 @info "test"

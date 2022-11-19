@@ -1,5 +1,6 @@
-using RemoteLogging
+using RemoteLogging.Terminal
 
-conn = setup_logger()
+logging, progress = activate()
+
 @remotelog 1000 "hello"
 @log_attention "test"
