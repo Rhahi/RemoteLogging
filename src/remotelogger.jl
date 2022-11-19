@@ -1,6 +1,4 @@
-abstract type Message end
-
-struct LogMessage <: Message
+struct LogMessage
     level::Int32
     message::String
     logmodule::Module
@@ -10,12 +8,13 @@ struct LogMessage <: Message
     line::Int32
 end
 
-struct ProgressMessage <: Message
+struct ProgressId
     id::UUID
+    parentid::UUID
     name::String
-    progress::Float32
 end
-
+ProgressId() = ProgressId(uuid4(), ProgressLogging.ROOTID, "")
+ProgressId(parentid::UUID) = ProgressId(uuid4(), parentid, "")
 
 function package_logdata(_module, file, line, level, message, exs...)
     @nospecialize
@@ -66,11 +65,38 @@ function send_logdata(data)
 end
 send_logdata(loggingchan, data) = put!(loggingchan, data); nothing
 
-function start_progress()
+"""Begin progress bar and return its id"""
+function progress_init(parentid::UUID, name)
+    global progresschan
+    id = ProgressId(uuid4(), parentid, name)
+    put!(progresschan, Progress(id=id.id, parentid=parentid, name=name))
+    return id
+end
+progress_init(name="") = progress_init(ProgressLogging.ROOTID, name)
+progress_init(id::ProgressId, name) = progress_init(id.id, name)
+
+"""Update progress bar. Implicitly end when reaching 1."""
+function progress_update(id::ProgressId, fraction, name=nothing)
+    global progresschan
+    done = false
+    if fraction ≥ 1
+        done = true
+    end
+    if isnothing(name)
+        name = id.name
+    end
+    msg = Progress(id.id, id.parentid, clamp(fraction, 0, 1), name, done)
+    put!(progresschan, msg)
+    nothing
 end
 
-function update_progress()
-end
-
-function end_progress()
+"""Explicitly end progress bar"""
+function progress_end(id::ProgressId; name=nothing)
+    global progresschan
+    if isnothing(name)
+        name = id.name
+    end
+    msg = Progress(id.id, id.parentid, nothing, name, true)
+    put!(progresschan, msg)
+    nothing
 end

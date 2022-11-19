@@ -1,7 +1,7 @@
 module Terminal
 
 using RemoteLogging
-using RemoteLogging: restore_callsite_source_position!
+using RemoteLogging: restore_callsite_source_position!, progress_init, progress_update, progress_end
 using Sockets
 
 function activate(host=IPv4(0), base_port=50021)
@@ -10,7 +10,7 @@ function activate(host=IPv4(0), base_port=50021)
     return logger, progress
 end
 
-export activate, @remotelog
+export activate, @remotelog, progress_init, progress_update, progress_end
 export @log_timer, @log_traceloop, @log_trace, @log_exit, @log_entry, @log_dev, @log_guidance
 export @log_status, @log_module, @log_system, @log_ok, @log_mark, @log_attention, @asyncx
 
