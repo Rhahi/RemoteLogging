@@ -14,8 +14,8 @@ import Base.CoreLogging: default_group_code, log_record_id, @_sourceinfo
 
 
 include("loglevels.jl")
-include("loglevels_native.jl")
-include("loglevels_remote.jl")
+include("loglevels_printer.jl")
+include("loglevels_terminal.jl")
 include("remotelogger.jl")
 include("remoteprogress.jl")
 include("setup_host.jl")
