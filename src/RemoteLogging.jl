@@ -23,17 +23,14 @@ include("setup_client.jl")
 
 
 # RemoteLogging
-export NativeLogLevels, LogMessage, ProgressMessage
+export Terminal, Printer, LogMessage, ProgressMessage
 export host_printer, host_data, host_logger, host_progress, host_dev
 export begin_logging_sink, begin_progress_sink
-export begin_logger, begin_progress, begin_printer
 
 # remote log macros
 export @remotelog, @logdata
 
 # SpaceLib log levels
-export @log_timer, @log_traceloop, @log_trace, @log_exit, @log_entry, @log_dev, @log_guidance
-export @log_status, @log_module, @log_system, @log_ok, @log_mark, @log_attention, @asyncx
 export LogTimer, LogTraceLoop, LogTrace, LogExit, LogEntry, LogGuidance, LogDev
 export LogStatus, LogModule, LogSystem, LogOk, LogMark, LogAttention
 export @dev_json
