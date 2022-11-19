@@ -1,5 +1,5 @@
 "Begin terminal logger and progress logger"
-function activate_terminal(logger=TerminalLogger(stderr, LogLevel(-1000)))
+function activate_terminal(logger=TerminalLogger(stderr, LogLevel(-999)))
     global_logger(logger)
     chan1 = Channel{LogMessage}(100)
     chan2 = Channel{Progress}(100)
@@ -10,7 +10,8 @@ function activate_terminal(logger=TerminalLogger(stderr, LogLevel(-1000)))
     @async begin_progress_sink(chan2, active)
     @info("Terminal activated. Press enter to return...")
     readline(stdin)
-    return active
+    clear_progress(active)
+    return server1, server2, active
 end
 
 
@@ -104,11 +105,10 @@ function begin_progress_sink(chan::Channel{Progress}, active::Vector{UUID})
         if progress.id ∉ active
             push!(active, progress.id)
         else
-            progress.done || continue
-            isnothing(progress.fraction) && continue
-            progress.fraction < 1 && continue
-            idx = findfirst(x->x==progress.id, active)
-            deleteat!(active, idx)
+            if progress.done || isnothing(progress.fraction) || progress.fraction ≥ 1
+                idx = findfirst(x->x==progress.id, active)
+                deleteat!(active, idx)
+            end
         end
     end
 end
@@ -126,7 +126,7 @@ end
 "Clear all progress bars"
 function clear_progress(active::Vector{UUID})
     while length(active) > 0
-        p = popfirst!(active)
-        @info Progress(id=p.id, name="Cleanup", done=true) _group=:pgbar
+        id = popfirst!(active)
+        @info Progress(id, done=true) _group=:pgbar
     end
 end
