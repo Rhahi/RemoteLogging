@@ -45,11 +45,11 @@ macro logdata(level, exs...)
 end
 
 function send_logdata(data)
-    global chan
-    if !@isdefined chan
-        @warn "logchan not set up"
+    global loggingchan
+    if !@isdefined loggingchan
+        @warn "loggingchan not set up"
     end
-    put!(chan, data)
+    put!(loggingchan, data)
     nothing
 end
-send_logdata(chan, data) = put!(chan, data); nothing
+send_logdata(loggingchan, data) = put!(loggingchan, data); nothing

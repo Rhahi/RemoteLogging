@@ -1,13 +1,13 @@
 "Remote logging via TCP. Does not supprot keyword arguments (ignored)"
 function begin_logger(host=IPv4(0), port=50021)
-    global chan = Channel{LogMessage}(50)
-    conn = setup_data(chan, host, port)
+    global loggingchan = Channel{LogMessage}(50)
+    conn = setup_data(loggingchan, host, port)
     return conn
 end
 
 function begin_progress(host=IPv4(0), port=50022)
-    global chan = Channel{ProgressMessage}(50)
-    conn = setup_data(chan, host, port)
+    global progresschan = Channel{ProgressMessage}(50)
+    conn = setup_data(progresschan, host, port)
     return conn
 end
 
