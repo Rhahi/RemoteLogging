@@ -40,22 +40,21 @@ function match_loglevel(level::Integer)
     LogLevel(level)
 end
 
-
 function default_logcolor(level::ExtraLogLevel)
-    level.level == -900 ? :blue :
-    level.level == -800 ? :blue :
-    level.level == -700 ? :blue :
-    level.level == -600 ? :blue :
-    level.level == -400 ? :blue :
-    level.level == -300 ? :blue :
-    level.level == -200 ? :blue :
-    level.level == -100 ? :blue :
-    level.level ==  100 ? :cyan :
-    level.level ==  300 ? :cyan :
-    level.level ==  400 ? :cyan :
-    level.level ==  600 ? :cyan :
-    level.level ==  800 ? :cyan :
-    level.level == 1500 ? :yellow :
+    level.level == -900 ? 0 :         # LogGraphic
+    level.level == -800 ? 22 :        # LogTimer
+    level.level == -700 ? 0 :         # LogTraceLoop
+    level.level == -600 ? 8 :         # LogTrace
+    level.level == -400 ? 23 :        # LogExit
+    level.level == -300 ? 23 :        # LogEntry
+    level.level == -200 ? :blue :     # LogGuidance
+    level.level == -100 ? :magenta :  # LogDev
+    level.level ==  100 ? :cyan :     # LogStatus
+    level.level ==  300 ? :green :    # LogModule
+    level.level ==  400 ? :green :    # LogSystem
+    level.level ==  600 ? :green :    # LogOk
+    level.level ==  800 ? 123 :       # LogMark
+    level.level == 1500 ? :yellow :   # LogAttention
     TerminalLogger.default_logcolor(level)
 end
 
@@ -79,6 +78,6 @@ function show_colors()
     for i in 0:255
         num = rpad(string(i), 3)
         printstyled("test[$num] ", bold=true, color=i)
-        printstyled("test[$num] ", bold=false, color=i)
+        printstyled("test[$num] \n", bold=false, color=i)
     end
 end
