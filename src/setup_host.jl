@@ -1,19 +1,30 @@
 "Begin terminal logger and progress logger"
-function activate_terminal(logger=TerminalLogger(stderr, LogLevel(-999)))
+function activate_terminal(logger=TerminalLogger(stderr, LogLevel(-650));
+    port_logger = 50020,
+    port_progress = port_logger+1
+)
+    global parked_logger = logger
     global_logger(logger)
     chan1 = Channel{LogMessage}(100)
     chan2 = Channel{Progress}(100)
-    server1 = host_logger(chan1)
-    server2 = host_progress(chan2)
+    server1 = host_logger(chan1; port=port_logger)
+    server2 = host_progress(chan2; port=port_progress)
     active = Vector{UUID}()
-    @async begin_logging_sink(chan1)
-    @async begin_progress_sink(chan2, active)
-    @info("Terminal activated. Press enter to return...")
-    readline(stdin)
-    clear_progress(active)
+    @asyncx begin_logging_sink(chan1)
+    @asyncx begin_progress_sink(chan2, active)
     return server1, server2, active
 end
 
+function wait_for_input()
+    ll = global_logger().min_level
+    @info("Waiting for user input...")
+    readline(stdin)
+    isinteractive() && @warn("Default log level may have changed. Previous: $ll")
+end
+function wait_for_input(active)
+    wait_for_input(silence)
+    clear_progress(active)
+end
 
 "Accept any log messages and print them"
 function activate_printer(host=IPv4(0), port=50010)
@@ -44,6 +55,7 @@ end
 "Accept arbitrary data, deserialize and display them (display sold separately)"
 function host_data(chan::Channel{T}, host=IPv4(0), port=50020) where T <: Union{Progress, LogMessage}
     server = listen(host, port)
+    @info "Hosting $T at $port"
     @async begin
         while true
             conn = accept(server)
@@ -58,15 +70,16 @@ function host_data(chan::Channel{T}, host=IPv4(0), port=50020) where T <: Union{
                 catch e
                     @warn e
                 finally
-                    @warn "Lost connection with" conn
+                    @info "Lost connection with a client"
                     close(conn)
                 end
             end
         end
     end
+    return server
 end
-host_logger(chan::Channel{LogMessage}, host=IPv4(0), port=50021) = host_data(chan, host, port)
-host_progress(chan::Channel{Progress}, host=IPv4(0), port=50022) = host_data(chan, host, port)
+host_logger(chan::Channel{LogMessage}; host=IPv4(0), port=50021) = host_data(chan, host, port)
+host_progress(chan::Channel{Progress}; host=IPv4(0), port=50022) = host_data(chan, host, port)
 
 "Simply print without multi-connection and conversions"
 function host_dev(host=IPv4(0), port=50030)
@@ -129,4 +142,9 @@ function clear_progress(active::Vector{UUID})
         id = popfirst!(active)
         @info Progress(id, done=true) _group=:pgbar
     end
+end
+
+function restore()
+    global parked_logger
+    global_logger(parked_logger)
 end
