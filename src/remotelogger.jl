@@ -1,13 +1,15 @@
 struct LogMessage
     level::Int32
     message::String
-    logmodule::Module
+    logmodule::Symbol
     group::Symbol
     id::Symbol
     file::String
     line::Int32
 end
-
+function LogMessage(level, message, logmodule::Module, args...)
+    LogMessage(level, message, Symbol(logmodule), args...)
+end
 struct ProgressId
     id::UUID
     parentid::UUID
@@ -38,15 +40,15 @@ function package_logdata(_module, file, line, level, message, exs...)
     if !@isdefined(_id)
         _id = log_record_id(_module, level, message, exs)
     end
-    # inspect = _group
-    # println(inspect, " ", typeof(inspect))
     return LogMessage(level, message, _module, _group, _id, file, line)
 end
 
-"""generic remote logging macro"""
+"""client: generic remote logging macro"""
 macro remotelog(level, exs...)
-    data = package_logdata((@_sourceinfo)..., level, exs...)
-    :(send_logdata($data))
+    quote
+        data = package_logdata(($(@_sourceinfo))..., $level, $(esc(exs...)))
+        send_logdata(data)
+    end
 end
 
 """get log obejct instead of sending them immdiately"""
@@ -55,25 +57,28 @@ macro logdata(level, exs...)
 end
 
 """send log data remotely"""
-function send_logdata(data)
+function send_logdata(ld)
     global loggingchan
     if !@isdefined loggingchan
-        @warn "loggingchan not set up"
+        @logmsg 2000 ld.message _group=ld.group _id=ld.id _module=ld.logmodule _file=ld.file _line=ld.line
+        return
     end
-    put!(loggingchan, data)
+    put!(loggingchan, ld)
     nothing
 end
 send_logdata(loggingchan, data) = put!(loggingchan, data); nothing
 
 """Begin progress bar and return its id"""
-function progress_init(parentid::UUID, name)
+function progress_init(parentid::UUID, name::String)
     global progresschan
     id = ProgressId(uuid4(), parentid, name)
     put!(progresschan, Progress(id=id.id, parentid=parentid, name=name))
     return id
 end
-progress_init(name="") = progress_init(ProgressLogging.ROOTID, name)
-progress_init(id::ProgressId, name) = progress_init(id.id, name)
+progress_init(parentid::ProgressId, name::String) = progress_init(parentid.id, name)
+progress_init(name::String="") = progress_init(ProgressLogging.ROOTID, name)
+progress_init(parentid, name::Nothing) = nothing
+progress_init(name::Nothing) = nothing
 
 """Update progress bar. Implicitly end when reaching 1."""
 function progress_update(id::ProgressId, fraction, name=nothing)
@@ -89,9 +94,10 @@ function progress_update(id::ProgressId, fraction, name=nothing)
     put!(progresschan, msg)
     nothing
 end
+progress_update(id::Nothing, fraction, name=nothing) = nothing
 
 """Explicitly end progress bar"""
-function progress_end(id::ProgressId; name=nothing)
+function progress_end(id::ProgressId, name=nothing)
     global progresschan
     if isnothing(name)
         name = id.name
@@ -100,3 +106,6 @@ function progress_end(id::ProgressId; name=nothing)
     put!(progresschan, msg)
     nothing
 end
+progress_end(id::Nothing, name=nothing) = nothing
+
+Base.fullname(s::Symbol) = (s,)
