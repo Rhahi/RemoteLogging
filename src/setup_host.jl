@@ -16,10 +16,9 @@ function activate_terminal(logger=TerminalLogger(stderr, LogLevel(-650));
 end
 
 function wait_for_input()
-    ll = global_logger().min_level
     @info("Waiting for user input...")
     readline(stdin)
-    isinteractive() && @warn("Default log level may have changed. Previous: $ll")
+    isinteractive() && @warn("Logger may have been changed")
 end
 function wait_for_input(active)
     wait_for_input(silence)
