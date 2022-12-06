@@ -11,7 +11,7 @@ function activate(host=IPv4(0); port_logger=50020, port_progress=port_logger+1)
     return logger, progress
 end
 
-export activate, @remotelog, progress_init, progress_update, progress_end, wait_for_input
+export activate, @remotelog, progress_init, progress_subinit, progress_update, progress_end, wait_for_input
 export @log_debug, @log_timer, @log_traceloop, @log_trace, @log_exit, @log_entry, @log_dev, @log_guidance
 export @log_info, @log_status, @log_module, @log_system, @log_ok, @log_mark
 export @log_warn, @log_attention
