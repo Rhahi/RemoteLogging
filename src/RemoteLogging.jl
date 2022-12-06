@@ -37,8 +37,8 @@ global parked_logger = global_logger()
 # RemoteLogging
 export Terminal, Printer
 export activate_printer, activate_terminal, clear_progress
-export progress_init, progress_update, progress_end
-export spacelogger, wait_for_input, restore
+export progress_init, progress_subinit, progress_update, progress_end
+export metlogger, utlogger, wait_for_input, restore
 export format_MET, format_UT
 
 # remote log macros
