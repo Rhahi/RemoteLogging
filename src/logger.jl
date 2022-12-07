@@ -1,10 +1,10 @@
 """Get a tee logger with filters enabled"""
-function spacelogger(sp, level::LogLevel;
+function metlogger(sp, level::LogLevel;
     log_path::Union{Nothing, String}=nothing, log_name="Untitled"
 )
     if isnothing(log_path)
         console = TerminalLogger(stderr, level) |> filter_module
-        add_met = add_MET(sp, console)
+        add_met = add_MET(sp.ts, console)
     else
         log_file = create_log_home(log_path, log_name)
         io = open(log_file, "a")
@@ -13,9 +13,27 @@ function spacelogger(sp, level::LogLevel;
         console = TerminalLogger(stderr, level)
         spacelib = io |> FileLogger |> filter_group
         tee = TeeLogger(spacelib, console) |> filter_module
-        add_met = add_MET(sp, tee)
+        add_met = add_MET(sp.ts, tee)
     end
     return add_met
+end
+
+function utlogger(ts, level::LogLevel;
+    log_path::Union{Nothing, String}=nothing, log_name="Untitled",
+    use_relative=true
+)
+    if isnothing(log_path)
+        console = TerminalLogger(stderr, level) |> filter_module
+        add_ut = add_UT(ts, console; use_relative=use_relative)
+    else
+        log_file = create_log_home(log_path, log_name)
+        io = open(log_file, "a")
+        console = TerminalLogger(stderr, level)
+        spacelib = io |> FileLogger |> filter_group
+        tee = TeeLogger(spacelib, console) |> filter_module
+        add_ut = add_UT(ts, tee; use_relative=use_relative)
+    end
+    return add_ut
 end
 
 """filter out items to be displayed only for console"""
@@ -40,11 +58,23 @@ function root_module(m::Module)
     end
     nameof(gp)
 end
+root_module(m::Symbol) = m
 
-function add_MET(sp, logger)
+function add_MET(ts, logger)
     TransformerLogger(logger) do log
-        met = format_MET(sp.system.met)
+        met = format_MET(ts.met)
         merge(log, (; message = "$met | $(log.message)"))
+    end
+end
+
+function add_UT(ts, logger; use_relative)
+    TransformerLogger(logger) do log
+        if use_relative
+            time = format_MET(ts.ut - ts.offset)
+        else
+            time = format_UT(ts.ut)
+        end
+        merge(log, (; message = "$time | $(log.message)"))
     end
 end
 
