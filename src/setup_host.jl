@@ -146,4 +146,5 @@ end
 function restore()
     global parked_logger
     global_logger(parked_logger)
+    nothing
 end
