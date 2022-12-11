@@ -28,7 +28,7 @@ include("loglevels.jl")
 include("remotelogger.jl")
 include("setup_host.jl")
 include("setup_client.jl")
-include("loglevels_native.jl")
+include("logmacros.jl")
 include("logger.jl")
 
 global parked_logger = global_logger()
