@@ -1,23 +1,4 @@
-function begin_progress(host=IPv4(0), port=50022)
-    global progresschan = Channel{Progress}(50)
-    conn = setup_progress(progresschan, host, port)
-    return conn
-end
-
-function setup_progress(chan::Channel{Progress}, host=IPv4(0), port=50020)
-    conn = connect(host, port)
-    @async begin
-        try
-            while true
-                serialize(conn, take!(chan))
-            end
-        catch e
-            @warn e
-        finally
-            close(conn)
-        end
-    end
-    return conn
+function activate(logger=nothing; host=IPv4(0), port=50020, displaywidth=80)
 end
 
 "Remote printing through TCP"

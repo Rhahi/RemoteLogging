@@ -1,5 +1,5 @@
 "Begin terminal logger and progress logger"
-function activate(logger=TerminalLogger(); host=IPv4(0), port=50020)
+function start_server(logger=TerminalLogger(); host=IPv4(0), port=50020)
     global parked_logger = logger
     global_logger(logger)
     chan = Channel{Progress}(100)
@@ -46,33 +46,6 @@ function activate_printer(host=IPv4(0), port=50010)
     end
 end
 
-"Accept progress data, deserialize and pass them to sink"
-function host_progress(chan::Channel{T}, host=IPv4(0), port=50011) where T <: Progress
-    server = listen(host, port)
-    @info "Hosting $T at $port"
-    @async begin
-        while true
-            conn = accept(server)
-            @info "New client accepted"
-            @async begin
-                try
-                    while true
-                        data = deserialize(conn)
-                        put!(chan, data)
-                        eof(conn) && break
-                    end
-                catch e
-                    @warn e
-                finally
-                    @info "Lost connection with a client"
-                    close(conn)
-                end
-            end
-        end
-    end
-    return server
-end
-
 "Simply print without multi-connection and conversions"
 function host_dev(host=IPv4(0), port=50030)
     server = listen(host, port)
@@ -101,28 +74,11 @@ function begin_debug_logger()
     nothing
 end
 
-"Activate progress logging for this console"
-function begin_progress_sink(chan::Channel{Progress}, active::Vector{UUID})
-    @info "Progress sink activated!"
-    while true
-        progress = take!(chan)
-        @info progress _group=:pgbar
-        if progress.id ∉ active
-            push!(active, progress.id)
-        else
-            if progress.done || isnothing(progress.fraction) || progress.fraction ≥ 1
-                idx = findfirst(x->x==progress.id, active)
-                deleteat!(active, idx)
-            end
-        end
-    end
-end
-
 "Clear all progress bars"
 function clear_progress(active::Vector{UUID})
     while length(active) > 0
         id = popfirst!(active)
-        @info Progress(id, done=true) _group=:pgbar
+        @info Progress(id, done=true)
     end
 end
 

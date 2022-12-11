@@ -25,7 +25,7 @@ macro asyncx(ex)
 end
 
 include("loglevels.jl")
-include("remotelogger.jl")
+include("progress.jl")
 include("setup_host.jl")
 include("setup_client.jl")
 include("logmacros.jl")
@@ -40,7 +40,7 @@ export metlogger, utlogger, wait_for_input, restore
 export format_MET, format_UT
 
 # remote log macros
-export activate
+export activate, start_server
 export @log_timer, @log_traceloop, @log_trace, @log_exit, @log_entry, @log_dev, @log_guidance
 export @log_status, @log_module, @log_system, @log_ok, @log_mark, @log_attention, @asyncx
 
