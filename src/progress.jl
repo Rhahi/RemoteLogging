@@ -13,10 +13,8 @@ function progress_init(parentid::UUID, name::String)
     id = ProgressId(uuid4(), parentid, name)
     msg = Progress(id.id, parentid, 0, name, false)
     if @isdefined progresschan
-        println("using remote")
         put!(progresschan, msg)
     else
-        println("using local")
         @info msg _group=:pgbar
     end
     return id
