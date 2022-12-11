@@ -58,7 +58,6 @@ function root_module(m::Module)
     end
     nameof(gp)
 end
-root_module(m::Symbol) = m
 
 function add_MET(ts, logger)
     TransformerLogger(logger) do log

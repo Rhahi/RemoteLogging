@@ -1,8 +1,3 @@
-function activate(logger, level; host=IPv4(0), base_port=50010)
-    printer = RemoteLogging.begin_printer(logger; host=host, port=base_port, min_level=level)
-    return printer
-end
-
 """debug information about drawing"""
 macro log_graphic(exs...)   return restore_callsite_source_position!(esc(:($Base.@logmsg LogGraphic $(exs...))), __source__,) end
 

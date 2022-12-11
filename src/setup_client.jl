@@ -1,17 +1,10 @@
-"Remote logging via TCP. Does not supprot keyword arguments (ignored)"
-function begin_logger(host=IPv4(0), port=50021)
-    global loggingchan = Channel{LogMessage}(50)
-    conn = setup_data(loggingchan, host, port)
-    return conn
-end
-
 function begin_progress(host=IPv4(0), port=50022)
     global progresschan = Channel{Progress}(50)
-    conn = setup_data(progresschan, host, port)
+    conn = setup_progress(progresschan, host, port)
     return conn
 end
 
-function setup_data(chan::Channel{T}, host=IPv4(0), port=50020) where T <: Union{Progress, LogMessage}
+function setup_progress(chan::Channel{Progress}, host=IPv4(0), port=50020)
     conn = connect(host, port)
     @async begin
         try

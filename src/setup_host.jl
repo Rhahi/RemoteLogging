@@ -1,18 +1,13 @@
 "Begin terminal logger and progress logger"
-function activate_terminal(logger=TerminalLogger(stderr, LogLevel(-650));
-    port_logger = 50020,
-    port_progress = port_logger+1
-)
+function activate(logger=TerminalLogger(); host=IPv4(0), port=50020)
     global parked_logger = logger
     global_logger(logger)
-    chan1 = Channel{LogMessage}(100)
-    chan2 = Channel{Progress}(100)
-    server1 = host_logger(chan1; port=port_logger)
-    server2 = host_progress(chan2; port=port_progress)
-    active = Vector{UUID}()
-    @asyncx begin_logging_sink(chan1)
-    @asyncx begin_progress_sink(chan2, active)
-    return server1, server2, active
+    chan = Channel{Progress}(100)
+    server = host_progress(chan, host, port+1)
+    progress_list = Vector{UUID}()
+    @asyncx activate_printer(host, port)
+    @asyncx begin_progress_sink(chan, progress_list)
+    return server, progress_list
 end
 
 function wait_for_input()
@@ -25,7 +20,7 @@ function wait_for_input(active)
     clear_progress(active)
 end
 
-"Accept any log messages and print them"
+"Accept any print messages and print them"
 function activate_printer(host=IPv4(0), port=50010)
     server = listen(host, port)
     atmoic_print = Base.Semaphore(1)
@@ -51,8 +46,8 @@ function activate_printer(host=IPv4(0), port=50010)
     end
 end
 
-"Accept arbitrary data, deserialize and display them (display sold separately)"
-function host_data(chan::Channel{T}, host=IPv4(0), port=50020) where T <: Union{Progress, LogMessage}
+"Accept progress data, deserialize and pass them to sink"
+function host_progress(chan::Channel{T}, host=IPv4(0), port=50011) where T <: Progress
     server = listen(host, port)
     @info "Hosting $T at $port"
     @async begin
@@ -77,8 +72,6 @@ function host_data(chan::Channel{T}, host=IPv4(0), port=50020) where T <: Union{
     end
     return server
 end
-host_logger(chan::Channel{LogMessage}; host=IPv4(0), port=50021) = host_data(chan, host, port)
-host_progress(chan::Channel{Progress}; host=IPv4(0), port=50022) = host_data(chan, host, port)
 
 "Simply print without multi-connection and conversions"
 function host_dev(host=IPv4(0), port=50030)
@@ -122,16 +115,6 @@ function begin_progress_sink(chan::Channel{Progress}, active::Vector{UUID})
                 deleteat!(active, idx)
             end
         end
-    end
-end
-
-"Activate remote logging for this console"
-function begin_logging_sink(chan::Channel{LogMessage})
-    @info "Terminal sink activated!"
-    while true
-        ld = take!(chan)
-        level = match_loglevel(ld.level)
-        @logmsg level ld.message _group=ld.group _id=ld.id _module=ld.logmodule _file=ld.file _line=ld.line
     end
 end
 
