@@ -38,7 +38,11 @@ function progress_update(id::ProgressId, fraction, name=nothing)
         name = id.name
     end
     msg = Progress(id.id, id.parentid, clamp(fraction, 0, 1), name, done)
-    put!(progresschan, msg)
+    if @isdefined progresschan
+        put!(progresschan, msg)
+    else
+        @info msg _group=:pgbar
+    end
     nothing
 end
 progress_update(id::Nothing, fraction, name=nothing) = nothing
@@ -50,9 +54,11 @@ function progress_end(id::ProgressId, name=nothing)
         name = id.name
     end
     msg = Progress(id.id, id.parentid, nothing, name, true)
-    put!(progresschan, msg)
+    if @isdefined progresschan
+        put!(progresschan, msg)
+    else
+        @info msg _group=:pgbar
+    end
     nothing
 end
 progress_end(id::Nothing, name=nothing) = nothing
-
-Base.fullname(s::Symbol) = (s,)
