@@ -29,7 +29,6 @@ include("remotelogger.jl")
 include("setup_host.jl")
 include("setup_client.jl")
 include("loglevels_native.jl")
-include("loglevels_terminal.jl")
 include("logger.jl")
 
 global parked_logger = global_logger()
@@ -42,7 +41,9 @@ export metlogger, utlogger, wait_for_input, restore
 export format_MET, format_UT
 
 # remote log macros
-export @remotelog, @logdata
+export activate
+export @log_timer, @log_traceloop, @log_trace, @log_exit, @log_entry, @log_dev, @log_guidance
+export @log_status, @log_module, @log_system, @log_ok, @log_mark, @log_attention, @asyncx
 
 # SpaceLib log levels
 export LogTimer, LogTraceLoop, LogTrace, LogExit, LogEntry, LogGuidance, LogDev
