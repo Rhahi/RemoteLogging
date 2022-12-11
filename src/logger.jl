@@ -1,5 +1,5 @@
 function simple_console_logger(io::IO=stderr, level=LogLevel(-1))
-    console = TerminalLogger(io, level) |> filter_group |> filter_module
+    console = TerminalLogger(io, level) |> filter_module
     return console
 end
 
