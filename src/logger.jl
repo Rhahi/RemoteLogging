@@ -1,39 +1,42 @@
-"""Get a tee logger with filters enabled"""
-function metlogger(sp, level::LogLevel;
-    log_path::Union{Nothing, String}=nothing, log_name="Untitled"
-)
-    if isnothing(log_path)
-        console = TerminalLogger(stderr, level) |> filter_module
-        add_met = add_MET(sp.ts, console)
-    else
-        log_file = create_log_home(log_path, log_name)
-        io = open(log_file, "a")
-        sp.system.ios[:file_logger] = io
-        sp.system.home = log_file
-        console = TerminalLogger(stderr, level)
-        spacelib = io |> FileLogger |> filter_group
-        tee = TeeLogger(spacelib, console) |> filter_module
-        add_met = add_MET(sp.ts, tee)
-    end
-    return add_met
+function simple_console_logger(io::IO=stderr, level=LogLevel(-1))
+    console = TerminalLogger(io, level) |> filter_group |> filter_module
+    return console
 end
 
-function utlogger(ts, level::LogLevel;
-    log_path::Union{Nothing, String}=nothing, log_name="Untitled",
-    use_relative=true
+function simple_file_logger(file_path, io::IO=stderr, level=LogLevel(-1))
+    fileio = open(file_path, "a")
+    console = TerminalLogger(io, level)
+    spacelib = io |> FileLogger |> filter_group
+    tee = TeeLogger(spacelib, console) |> filter_module
+    return tee, fileio
+end
+
+"Logger with MET. Connection to Spacecraft is required."
+function metlogger(sp, io::IO=stderr, level=LogLevel(-1);
+    log_path=nothing, log_name="Untitled"
 )
     if isnothing(log_path)
-        console = TerminalLogger(stderr, level) |> filter_module
-        add_ut = add_UT(ts, console; use_relative=use_relative)
+        logger = simple_console_logger(io, level)
+        fileio = nothing
     else
         log_file = create_log_home(log_path, log_name)
-        io = open(log_file, "a")
-        console = TerminalLogger(stderr, level)
-        spacelib = io |> FileLogger |> filter_group
-        tee = TeeLogger(spacelib, console) |> filter_module
-        add_ut = add_UT(ts, tee; use_relative=use_relative)
+        logger, fileio = simple_file_logger(log_file, io, level)
     end
-    return add_ut
+    return add_MET(sp.ts, logger), fileio
+end
+
+"Logger with UT. Connection to KRPC is required."
+function utlogger(ts, io::IO=stderr, level=LogLevel(-1);
+    log_path=nothing, log_name="Untitled", use_relative=true
+)
+    if isnothing(log_path)
+        logger = simple_console_logger(io, level)
+        fileio = nothing
+    else
+        log_file = create_log_home(log_path, log_name)
+        logger, fileio = simple_file_logger(log_file, io, level)
+    end
+    return add_UT(ts, logger; use_relative=use_relative), fileio
 end
 
 """filter out items to be displayed only for console"""

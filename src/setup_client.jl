@@ -21,11 +21,24 @@ function setup_progress(chan::Channel{Progress}, host=IPv4(0), port=50020)
 end
 
 "Remote printing through TCP"
-function begin_printer(logger=TerminalLogger; host=IPv4(0), port=50010, min_level=LogLevel(-1000))
+function connect_to_listener(logger=nothing;
+    host=IPv4(0), port=50010, displaywidth=80
+)
     conn = connect(host, port)
-    ioc = IOContext(conn, :color => true)
-    logger = logger(ioc, min_level)
+    dsize = (displaysize()[1], displaywidth)
+    ioc = IOContext(conn, :color => true, :displaysize => dsize)
+    if isnothing(logger)
+        logger = TerminalLogger(ioc, LogLevel(-650))
+    end
     global_logger(logger)
     return conn
 end
-setup_dev() = begin_printer(; port=50030)
+
+"Remote printing through TCP"
+function setup_dev(host=IPv4(0), port=50030, level=LogLevel(-1000))
+    conn = connect(host, port)
+    ioc = IOContext(conn, :color => true)
+    logger = TerminalLogger(ioc, level)
+    global_logger(logger)
+    return conn
+end
