@@ -42,7 +42,7 @@ export format_MET, format_UT
 # remote log macros
 export activate, start_server
 export @log_timer, @log_traceloop, @log_trace, @log_exit, @log_entry, @log_dev, @log_guidance
-export @log_status, @log_module, @log_system, @log_ok, @log_mark, @log_attention, @asyncx
+export @log_status, @log_module, @log_system, @log_ok, @log_mark, @log_attention
 
 # SpaceLib log levels
 export LogTimer, LogTraceLoop, LogTrace, LogExit, LogEntry, LogGuidance, LogDev
