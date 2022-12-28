@@ -1,5 +1,5 @@
 using RemoteLogging
 
-ref = activate_terminal(; port_logger=50050)
-clear() = clear_progress(ref[3])
+ref = start_server(; port=50050)
+clear() = clear_progress(ref[2])
 wait_for_input()
